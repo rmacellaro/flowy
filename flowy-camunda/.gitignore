@@ -1,0 +1,8 @@
+old
+.DS_Store
+
+/FlowyCamundaApi/bin
+/FlowyCamundaApi/obj
+
+/It.Flowy.Camunda/bin
+/It.Flowy.Camunda/obj
