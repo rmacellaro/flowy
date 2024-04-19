@@ -1,6 +1,6 @@
 import { Component, Input, OnInit, Output } from '@angular/core';
 import { Process } from '../models/process.model';
-import { EngineModellingProcessesService } from '../services/processes.service';
+import { EngineModellingService } from '../services/modelling.service';
 
 @Component({
   selector: 'engine-modelling-process-load',
@@ -29,7 +29,7 @@ export class EngineModellingProcessLoadComponent implements OnInit {
   public error?: string;
 
   constructor(
-    private modellingService: EngineModellingProcessesService
+    private modellingService: EngineModellingService
   ) {
     console.log('EngineModellingProcessLoadComponent');
   }

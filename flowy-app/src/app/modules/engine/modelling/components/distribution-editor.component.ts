@@ -1,212 +1,201 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+
+import { EngineModeler } from '../core/engine.modeler';
 import { Distribution } from '../models/distribution.model';
-import { EngineModellingDistributionLoadComponent } from './distribution-load.component';
 import { Node } from '../models/node.model';
-import { Interaction } from '../models/interaction.model';
+import { DataHelper } from '../../datas/helpers/data.helper';
+import { NodeData } from '../models/node-data.model';
+import { EngineModellingService } from '../services/modelling.service';
+import { Activity } from '../models/activity.model';
+import { NodeDataType } from '../models/node-data-type.model';
 
 @Component({
   selector: 'engine-modelling-distribution-editor',
   template: `
-    <div class="d-flex h-100 w-100" *ngIf="distribution">
-      <div class="border-end p-3 overflow-auto flex-grow-1">
-
-        <!-- Intestazione -->
-        <div class="card mb-2 p-2">
-          <div class="row align-items-center m-0">
-            <div class="col-auto">
-              <engine-modelling-distribution-version [distribution]="distribution"></engine-modelling-distribution-version>
-            </div>
+    <div class="w-100 h-100 d-flex flex-row position-relative">
+      <ui-spinner [isInLoading]="isInLoading"></ui-spinner>
+      <div class="flex-grow-1 d-flex flex-column bg-body-tertiary">
+        <div class="p-3 pb-1 flex-grow-0">
+          <div class="row">
             <div class="col">
+              <a (click)="modeler?.AddActivityToNode({ idNode: 1, id: 23, key: ''})">Test</a>
             </div>
             <div class="col-auto">
-              <div class="dropdown">
-                <a class="btn btn-link p-0"
-                  href="javascript:;" role="button"
-                  data-bs-toggle="dropdown" aria-expanded="false">
-                  <i class="bi bi-three-dots-vertical"></i>
-                </a>
-
-                <ul class="dropdown-menu">
-                  <li><a class="dropdown-item" href="javascript:;" (click)="editDistribution()">Modifica distribuzione</a></li>
-                  <li><a class="dropdown-item" href="javascript:;" (click)="addNode()">Aggiungi nodo alla distribuzione</a></li>
-                  <li><hr class="dropdown-divider"></li>
-                  <li><a class="dropdown-item" href="javascript:;" (click)="expand(true)">Espandi tutti</a></li>
-                  <li><a class="dropdown-item" href="javascript:;" (click)="expand(false)">Comprimi tutti</a></li>
-                </ul>
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <a class="btn btn-secondary" (click)="save()"><i class="bi bi-floppy"></i></a>
+              </div>
+            </div>
+            <div class="col-auto">
+              <div class="btn-group" role="group" aria-label="Basic example">
+                <a class="btn btn-secondary" (click)="modeler?.Fit()"><i class="bi bi-aspect-ratio"></i></a>
+                <a class="btn btn-secondary" (click)="modeler?.ZoomIn()"><i class="bi bi-zoom-in"></i></a>
+                <a class="btn btn-secondary" (click)="modeler?.ZoomOut()"><i class="bi bi-zoom-out"></i></a>
+                <a class="btn btn-secondary" (click)="modeler?.ZoomReset()"><i class="bi bi-search"></i></a>
               </div>
             </div>
           </div>
         </div>
-
-        <!-- nodo -->
-        <div class="mb-3" *ngFor="let item of distribution?.nodes">
-          <div class="border rounded border-primary p-2" [ngClass]="{'bg-selected': node == item}" >
-            <div class="row align-items-center m-0">
-              <div class="col text-ellipsis">
-                <div class="fw-semibold">{{item.title}}</div>
-                <!--<div class="fst-italic opacity-50 f-s-08 text-ellipsis">{{item.description}}</div>-->
-              </div>
-              <div class="col-auto">
-                <span class="rounded bg-primary p-1 px-2 text-white f-s-06">{{item.key}}</span>
-              </div>
-              <div class="col-auto">
-                <div class="dropdown">
-                  <a class="btn btn-link p-0"
-                    href="javascript:;" role="button"
-                    data-bs-toggle="dropdown" aria-expanded="false">
-                    <i class="bi bi-three-dots-vertical"></i>
-                  </a>
-
-                  <ul class="dropdown-menu">
-                    <li><a class="dropdown-item" href="javascript:;" (click)="editNode(item)">Modifica nodo</a></li>
-                    <li><a class="dropdown-item" href="javascript:;" (click)="addInteraction(item)">Aggiungi interazione al nodo</a></li>
-                  </ul>
-                </div>
-              </div>
-              <div class="col-auto">
-                <a class="btn btn-link p-0" (click)="item.isExpanded = !item.isExpanded">
-                  <i class="bi bi-chevron-down" *ngIf="!item.isExpanded"></i>
-                  <i class="bi bi-chevron-up" *ngIf="item.isExpanded"></i>
-                </a>
-              </div>
-            </div>
-          </div>
-
-          <div class="ms-3" *ngIf="item.isExpanded">
-            <div class="rounded p-2 mt-2"
-              [ngClass]="{
-                'bg-selected': interaction == inter,
-                'bg-body-secondary': interaction != inter
-              }"
-              *ngFor="let inter of item.interactions">
-              <div class="row align-items-center m-0">
-                <div class="col-auto opacity-50">
-                  {{inter.order}}
-                </div>
-                <div class="col">
-                  <div class="fw-semibold">{{inter.name}}</div>
-                  <!--<div class="fst-italic opacity-50 f-s-08">{{inter.description}}</div>-->
-                  <div>
-                    <span *ngFor="let nex of inter.nexts"
-                      class="rounded bg-primary p-1 px-2 text-white f-s-06 opacity-60">
-                      <i class="gi f-s-1 me-1">prompt_suggestion</i>
-                      <span>{{nex}}</span>
-                    </span>
-                  </div>
-                </div>
-                <div class="col-auto">
-                  <span class="font-light f-s-08 p-1 fw-light">{{inter.type}}</span>
-                </div>
-                <div class="col-auto">
-                  <div class="dropdown">
-                    <a class="btn btn-link p-0"
-                      href="javascript:;" role="button"
-                      data-bs-toggle="dropdown" aria-expanded="false">
-                      <i class="bi bi-three-dots-vertical"></i>
-                    </a>
-
-                    <ul class="dropdown-menu">
-                      <li><a class="dropdown-item" href="javascript:;" (click)="editInteraction(item, inter)">Modifica interazione</a></li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
+        <div class="overflow-auto flex-grow-1 p-2" #diagramDiv></div>
       </div>
-      <div class="flex-grow-0 overflow-auto p-3 w-50">
-        {{mode}}
+      <div class="flex-grow-0 border border-left overflow-auto p-3 w-25">
+        <div *ngIf="currentNode">
+          <engine-modelling-node-form
+            [node]="currentNode"
+            (onUpdated)="updatedNode()">
+          </engine-modelling-node-form>
+
+          <!--<div class="mb-3" *ngIf="currentNode.id">
+            <modelling-node-data-list [node]="currentNode" [editMode]="true" (onSaved)="updatedNode()">
+            </modelling-node-data-list>
+          </div>-->
+
+          <div *ngIf="currentNode.id">
+            <engine-modelling-activities-list
+              (onGoToActivity)="goToActivity($event)"
+              [node]="currentNode"
+            ></engine-modelling-activities-list>
+          </div>
+
+          <div *ngIf="currentNode.id">
+            <engine-modelling-links-list
+              [node]="currentNode"
+              (onGoToNode)="goToNode($event)"
+            ></engine-modelling-links-list>
+          </div>
+        </div>
+
+        <div *ngIf="currentActivity">
+          <modelling-activity-form
+            [activity]="currentActivity"
+            (onUpdated)="updateActivity()">
+          </modelling-activity-form>
+
+          <div class="mb-3" *ngIf="currentActivity.id">
+            <!--<datas-list
+              [datas]="currentActivity.datas"
+              (onUpdated)="updateActivity()"
+            ></datas-list>-->
+          </div>
+
+        </div>
       </div>
     </div>
   `
 })
-export class EngineModellingDistributionEditorComponent implements OnInit {
+export class EngineModellingDistributionEditorComponent implements OnInit, AfterViewInit {
 
-  public distribution?: Distribution;
-  public node?: Node;
-  public interaction?: Interaction;
+  @ViewChild('diagramDiv', { static: true }) public diagramDiv?: ElementRef;
+  @Input() distribution?: Distribution;
 
-  public mode: 'NONE' | 'EDIT_DISTRIBUTION' | 'ADD_NODE' | 'EDIT_NODE' | 'EDIT_INTERACTION' | 'ADD_INTERACTION' = 'NONE';
+  public modeler?: EngineModeler;
+  public currentNode?: Node;
+  public currentActivity?: Activity;
+  public isInLoading: boolean = true;
 
   constructor(
-    private distLoad: EngineModellingDistributionLoadComponent
-  ) {
-    this.setDistribution(this.distLoad.distribution);
-    this.distLoad.onLoadedDistribution.subscribe(dis => {
-      this.setDistribution(dis);
+    private modellingService: EngineModellingService,
+    private dataHelper: DataHelper
+  ) { }
+
+  ngOnInit(): void { }
+
+  ngAfterViewInit(): void {
+    setTimeout(()=>{
+      if (!this.diagramDiv) { return; }
+      this.modeler = new EngineModeler(this.diagramDiv.nativeElement);
+      this.modeler.onSelectNode = (idNode) => {
+        this.currentActivity = undefined;
+        if (!idNode) { this.currentNode = undefined; }
+        this.currentNode = this.distribution?.nodes?.find(n => n.id == idNode);
+      };
+      this.modeler.onSelectActivity = (idNode, idActivity) => {
+        this.currentNode = undefined;
+        if (!idNode || !idActivity) { this.currentActivity = undefined; }
+        var node = this.distribution?.nodes?.find(n => n.id == idNode);
+        this.currentActivity = node?.activities?.find(a => a.id == idActivity);
+      }
+      this.modeler.onRenderDone = () => {
+        if (this.isInLoading) {
+          this.isInLoading = false;
+          this.modeler?.Fit();
+        }
+      };
+      this.drawDistribution();
+    }, 500);
+  }
+
+
+  drawDistribution(): void {
+    console.log('drawDistribution');
+    if (!this.distribution) { return; }
+    this.distribution.nodes?.forEach((node) => {
+      // aggiungo il nodo allo schema
+      //console.log('ADD NODE', node);
+      this.modeler?.AddNode(node);
+      // aggiunco le activity al nodo
+      node.activities?.forEach(activity => {
+        this.modeler?.AddActivityToNode(activity);
+      });
+      // aggiungo gli output per il nodo
+      node.outputLinks?.forEach(link => {
+        this.modeler?.AddOutPortToNode(node.id, link.key);
+      });
+    });
+
+    // creo i link tra i nodi
+    this.distribution.nodes?.forEach((node) => {
+      node.outputLinks?.forEach(link => {
+        this.modeler?.AddLink(link);
+      });
+    });
+
+
+    //this.modeler?.Positioning();
+  }
+
+  save(): void {
+    this.isInLoading = true;
+    var nodeDatasPoints: Array<NodeData> = [];
+
+    this.distribution?.nodes?.forEach((node) => {
+      if (!node.id || !node.datas) { return; }
+      var point = this.modeler?.GetNodeElement(node.id)?.GetPosition();
+      if (point) {
+        var dataPoin: NodeData | undefined = node.datas.find(d => d.name == 'Schema.Position.Point');
+        if (!dataPoin) { dataPoin = { idNode : node.id, name: 'Schema.Position.Point' }; }
+        dataPoin.value = JSON.stringify(point);
+        nodeDatasPoints.push(dataPoin);
+      }
+    });
+    console.log(nodeDatasPoints);
+    this.modellingService.SaveNodeDatas(nodeDatasPoints).subscribe({
+      next: (res) => {
+        console.log(res);
+        this.isInLoading = false;
+      },
+      error: (err) => {
+        console.error(err);
+        this.isInLoading = false;
+      }
     });
   }
 
-  ngOnInit(): void {
-
+  updatedNode(): void {
+    if(!this.currentNode) { return; }
+    this.modeler?.UpdateNode(this.currentNode);
   }
 
-  setDistribution(dis?: Distribution): void {
-    this.distribution = dis;
-    if(!this.distribution) { return; }
-    if (this.distribution.nodes){
-      this.distribution.nodes.forEach(n => {
-        n.interactions?.sort((a,b) => {
-          if (!b.order || !a.order) { return 0; }
-          if (a.order > b.order) { return 1; }
-          if (a.order < b.order) { return -1; }
-          return 0;
-        });
-        n.interactions?.forEach(i => {
-          var c = i.configurations?.find(c => c.type == 'System.BE' && c.name == 'Nexts');
-          if (c && c.value) {
-            i.nexts = JSON.parse(c.value);
-          }
-        });
-      });
-    }
-    console.log('EDITOR', this.distribution);
+  updateActivity(): void {
+    if(!this.currentActivity) { return; }
+    this.modeler?.UpdateActivity(this.currentActivity);
   }
 
-  editDistribution(): void {
-    this.mode = 'EDIT_DISTRIBUTION';
-    this.node = undefined;
-    this.interaction = undefined;
+  goToNode(id: number): void {
+    this.modeler?.GoToNode(id);
   }
 
-  addNode(): void {
-    if (this.node) { this.node.isExpanded = false; }
-    this.node = undefined;
-    this.interaction = undefined;
-    this.mode = 'ADD_NODE';
-  }
-
-  editNode(node: Node): void {
-    if (this.node) { this.node.isExpanded = false; }
-    this.node = node;
-    node.isExpanded = true;
-    this.interaction = undefined;
-    this.mode= 'EDIT_NODE';
-  }
-
-  addInteraction(node: Node): void {
-    if (this.node) { this.node.isExpanded = false; }
-    this.node = node;
-    node.isExpanded = true;
-    this.interaction = undefined;
-    this.mode = 'ADD_INTERACTION';
-  }
-
-  editInteraction(node: Node, interaction: Interaction): void {
-    if (this.node) { this.node.isExpanded = false; }
-    this.node = node;
-    node.isExpanded = true;
-    this.interaction = interaction;
-    this.mode = 'EDIT_INTERACTION';
-  }
-
-  expand(isExpanded: boolean): void {
-    if (this.distribution){
-      this.distribution.nodes?.forEach(n => {
-        n.isExpanded = isExpanded;
-      });
-    }
+  goToActivity(activity: Activity): void {
+    if (!activity.idNode || !activity.id) { return;}
+    this.modeler?.GoToActivity(activity.idNode, activity.id);
   }
 }

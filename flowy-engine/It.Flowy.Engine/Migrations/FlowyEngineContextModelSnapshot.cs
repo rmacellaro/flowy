@@ -22,7 +22,7 @@ namespace It.Flowy.Engine.Migrations
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
 
-            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Configuration", b =>
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Activity", b =>
                 {
                     b.Property<long?>("Id")
                         .ValueGeneratedOnAdd()
@@ -30,16 +30,42 @@ namespace It.Flowy.Engine.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
 
-                    b.Property<long?>("IdInteraction")
+                    b.Property<long?>("IdActivityDefinition")
                         .HasColumnType("bigint");
 
-                    b.Property<bool?>("IsForProcessingOnly")
-                        .HasColumnType("tinyint(1)");
+                    b.Property<long?>("IdNode")
+                        .HasColumnType("bigint");
 
-                    b.Property<string>("Name")
+                    b.Property<int?>("Index")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Key")
                         .HasColumnType("longtext");
 
-                    b.Property<string>("Type")
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdActivityDefinition");
+
+                    b.HasIndex("IdNode");
+
+                    b.ToTable("Activities", "Modelling");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.ActivityData", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
+
+                    b.Property<long?>("IdActivity")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("IdActivityDefinitionDataType")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
                         .HasColumnType("longtext");
 
                     b.Property<string>("Value")
@@ -47,9 +73,75 @@ namespace It.Flowy.Engine.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdInteraction");
+                    b.HasIndex("IdActivity");
 
-                    b.ToTable("Configurations", "Modelling");
+                    b.HasIndex("IdActivityDefinitionDataType");
+
+                    b.ToTable("ActivityDatas", "Modelling");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.ActivityDefinition", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
+
+                    b.Property<string>("Group")
+                        .HasColumnType("longtext");
+
+                    b.Property<bool?>("HasFrontEnd")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ActivityDefinitions", "Modelling");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.ActivityDefinitionDataType", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
+
+                    b.Property<string>("DefaultValue")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DetailSettings")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("EditSettings")
+                        .HasColumnType("longtext");
+
+                    b.Property<long?>("IdActivityDefinition")
+                        .HasColumnType("bigint");
+
+                    b.Property<int?>("Index")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ShowSettings")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdActivityDefinition");
+
+                    b.ToTable("ActivityDefinitionDataTypes", "Modelling");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Distribution", b =>
@@ -82,7 +174,7 @@ namespace It.Flowy.Engine.Migrations
                     b.ToTable("Distributions", "Modelling");
                 });
 
-            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Interaction", b =>
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Link", b =>
                 {
                     b.Property<long?>("Id")
                         .ValueGeneratedOnAdd()
@@ -90,28 +182,22 @@ namespace It.Flowy.Engine.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
 
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
-                    b.Property<long?>("IdNode")
+                    b.Property<long?>("IdSourceNode")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
+                    b.Property<long?>("IdTargetNode")
+                        .HasColumnType("bigint");
 
-                    b.Property<int>("Order")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Type")
-                        .IsRequired()
+                    b.Property<string>("Key")
                         .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("IdNode");
+                    b.HasIndex("IdSourceNode");
 
-                    b.ToTable("Interactions", "Modelling");
+                    b.HasIndex("IdTargetNode");
+
+                    b.ToTable("Links", "Modelling");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Node", b =>
@@ -122,23 +208,10 @@ namespace It.Flowy.Engine.Migrations
 
                     MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
 
-                    b.Property<string>("Color")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Description")
-                        .HasColumnType("longtext");
-
                     b.Property<long?>("IdDistribution")
                         .HasColumnType("bigint");
 
                     b.Property<string>("Key")
-                        .IsRequired()
-                        .HasColumnType("longtext");
-
-                    b.Property<double?>("Percentage")
-                        .HasColumnType("double");
-
-                    b.Property<string>("Title")
                         .IsRequired()
                         .HasColumnType("longtext");
 
@@ -147,6 +220,72 @@ namespace It.Flowy.Engine.Migrations
                     b.HasIndex("IdDistribution");
 
                     b.ToTable("Nodes", "Modelling");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.NodeData", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
+
+                    b.Property<long?>("IdNode")
+                        .HasColumnType("bigint");
+
+                    b.Property<long?>("IdNodeDataType")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdNode");
+
+                    b.HasIndex("IdNodeDataType");
+
+                    b.ToTable("NodeDatas", "Modelling");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.NodeDataType", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
+
+                    b.Property<string>("DefaultValue")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("DetailSettings")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("EditSettings")
+                        .HasColumnType("longtext");
+
+                    b.Property<int?>("Index")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsEnabled")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("ShowSettings")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Type")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("NodeDataTypes", "Modelling");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Process", b =>
@@ -173,30 +312,6 @@ namespace It.Flowy.Engine.Migrations
                     b.ToTable("Processes", "Modelling");
                 });
 
-            modelBuilder.Entity("It.Flowy.Engine.Models.Processing.Data", b =>
-                {
-                    b.Property<long?>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
-
-                    b.Property<long?>("IdInstance")
-                        .HasColumnType("bigint");
-
-                    b.Property<string>("Name")
-                        .HasColumnType("longtext");
-
-                    b.Property<string>("Value")
-                        .HasColumnType("longtext");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("IdInstance");
-
-                    b.ToTable("Datas", "Processing");
-                });
-
             modelBuilder.Entity("It.Flowy.Engine.Models.Processing.Instance", b =>
                 {
                     b.Property<long?>("Id")
@@ -220,6 +335,30 @@ namespace It.Flowy.Engine.Migrations
                     b.HasIndex("IdDistribution");
 
                     b.ToTable("Instances", "Processing");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Processing.InstanceData", b =>
+                {
+                    b.Property<long?>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<long?>("Id"));
+
+                    b.Property<long?>("IdInstance")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("longtext");
+
+                    b.Property<string>("Value")
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("IdInstance");
+
+                    b.ToTable("InstanceDatas", "Processing");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Processing.Track", b =>
@@ -287,13 +426,43 @@ namespace It.Flowy.Engine.Migrations
                     b.ToTable("Wires", "Processing");
                 });
 
-            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Configuration", b =>
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Activity", b =>
                 {
-                    b.HasOne("It.Flowy.Engine.Models.Modelling.Interaction", "Interaction")
-                        .WithMany("Configurations")
-                        .HasForeignKey("IdInteraction");
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.ActivityDefinition", "ActivityDefinition")
+                        .WithMany()
+                        .HasForeignKey("IdActivityDefinition");
 
-                    b.Navigation("Interaction");
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.Node", "Node")
+                        .WithMany("Activities")
+                        .HasForeignKey("IdNode");
+
+                    b.Navigation("ActivityDefinition");
+
+                    b.Navigation("Node");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.ActivityData", b =>
+                {
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.Activity", "Activity")
+                        .WithMany("Datas")
+                        .HasForeignKey("IdActivity");
+
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.ActivityDefinitionDataType", "ActivityDefinitionDataType")
+                        .WithMany()
+                        .HasForeignKey("IdActivityDefinitionDataType");
+
+                    b.Navigation("Activity");
+
+                    b.Navigation("ActivityDefinitionDataType");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.ActivityDefinitionDataType", b =>
+                {
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.ActivityDefinition", "ActivityDefinition")
+                        .WithMany("DataTypes")
+                        .HasForeignKey("IdActivityDefinition");
+
+                    b.Navigation("ActivityDefinition");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Distribution", b =>
@@ -305,13 +474,19 @@ namespace It.Flowy.Engine.Migrations
                     b.Navigation("Process");
                 });
 
-            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Interaction", b =>
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Link", b =>
                 {
-                    b.HasOne("It.Flowy.Engine.Models.Modelling.Node", "Node")
-                        .WithMany("Interactions")
-                        .HasForeignKey("IdNode");
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.Node", "SourceNode")
+                        .WithMany("OutputLinks")
+                        .HasForeignKey("IdSourceNode");
 
-                    b.Navigation("Node");
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.Node", "TargetNode")
+                        .WithMany("InputLinks")
+                        .HasForeignKey("IdTargetNode");
+
+                    b.Navigation("SourceNode");
+
+                    b.Navigation("TargetNode");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Node", b =>
@@ -323,13 +498,19 @@ namespace It.Flowy.Engine.Migrations
                     b.Navigation("Distribution");
                 });
 
-            modelBuilder.Entity("It.Flowy.Engine.Models.Processing.Data", b =>
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.NodeData", b =>
                 {
-                    b.HasOne("It.Flowy.Engine.Models.Processing.Instance", "Instance")
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.Node", "Node")
                         .WithMany("Datas")
-                        .HasForeignKey("IdInstance");
+                        .HasForeignKey("IdNode");
 
-                    b.Navigation("Instance");
+                    b.HasOne("It.Flowy.Engine.Models.Modelling.NodeDataType", "NodeDataType")
+                        .WithMany()
+                        .HasForeignKey("IdNodeDataType");
+
+                    b.Navigation("Node");
+
+                    b.Navigation("NodeDataType");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Processing.Instance", b =>
@@ -339,6 +520,15 @@ namespace It.Flowy.Engine.Migrations
                         .HasForeignKey("IdDistribution");
 
                     b.Navigation("Distribution");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Processing.InstanceData", b =>
+                {
+                    b.HasOne("It.Flowy.Engine.Models.Processing.Instance", "Instance")
+                        .WithMany("Datas")
+                        .HasForeignKey("IdInstance");
+
+                    b.Navigation("Instance");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Processing.Track", b =>
@@ -365,19 +555,30 @@ namespace It.Flowy.Engine.Migrations
                     b.Navigation("Node");
                 });
 
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Activity", b =>
+                {
+                    b.Navigation("Datas");
+                });
+
+            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.ActivityDefinition", b =>
+                {
+                    b.Navigation("DataTypes");
+                });
+
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Distribution", b =>
                 {
                     b.Navigation("Nodes");
                 });
 
-            modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Interaction", b =>
-                {
-                    b.Navigation("Configurations");
-                });
-
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Node", b =>
                 {
-                    b.Navigation("Interactions");
+                    b.Navigation("Activities");
+
+                    b.Navigation("Datas");
+
+                    b.Navigation("InputLinks");
+
+                    b.Navigation("OutputLinks");
                 });
 
             modelBuilder.Entity("It.Flowy.Engine.Models.Modelling.Process", b =>

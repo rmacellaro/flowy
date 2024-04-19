@@ -40,6 +40,7 @@ a, .btn-link{
   --bs-link-hover-color: #26617e;
   --bs-primary: #3787AF;
   --bs-highlight-bg: #3787af1c;
+  --bs-primary-bg-subtle: var(--bs-highlight-bg);
 }
 
 .list-group{
@@ -608,3 +609,13 @@ td.shrink, th.shrink { white-space: nowrap; width: 1px;}
 
 
 .bg-selected{background-color: var(--bs-highlight-bg);}
+
+
+/* EDITOR DI PROCESSI */
+.joint-paper {
+  margin: 0 auto;
+  border: 1px solid var(--bs-border-color);
+  background: var(--bs-body-bg);
+  box-shadow: var(--bs-box-shadow-sm);
+  border-radius: var(--bs-border-radius);
+}

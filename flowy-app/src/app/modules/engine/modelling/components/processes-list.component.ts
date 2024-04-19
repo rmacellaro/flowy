@@ -1,5 +1,5 @@
 import { Component, Input, OnInit, TemplateRef } from '@angular/core';
-import { EngineModellingProcessesService } from '../services/processes.service';
+import { EngineModellingService } from '../services/modelling.service';
 import { Process } from '../models/process.model';
 
 @Component({
@@ -42,7 +42,7 @@ export class EngineModellingProcessesListComponent implements OnInit {
   public processes?: Array<Process>;
 
   constructor(
-    private modellingService: EngineModellingProcessesService
+    private modellingService: EngineModellingService
   ) { }
 
   ngOnInit(): void {

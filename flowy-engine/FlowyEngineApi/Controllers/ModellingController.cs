@@ -43,4 +43,60 @@ public class ModellingController(IModellingLogic modLog): Controller {
     var result = ModellingLogic.GetDistributionById(idDistribution);
     return Ok(result);
   }
+
+  [Route("[action]")]
+  [ProducesResponseType(typeof(List<NodeDataType>), 200)]
+  [ProducesResponseType(204)]
+  [ProducesResponseType(401)]
+  [ProducesResponseType(500)]
+  [HttpGet]
+  public IActionResult GetNodeDataTypes() {
+    var result = ModellingLogic.GetNodeDataTypes();
+    return Ok(result);
+  }
+
+  [Route("[action]")]
+  [ProducesResponseType(typeof(List<NodeData>), 200)]
+  [ProducesResponseType(204)]
+  [ProducesResponseType(401)]
+  [ProducesResponseType(500)]
+  [HttpPost]
+  public IActionResult SaveNodeDatas([FromBody] List<NodeData> nodeConfigs) {
+    ModellingLogic.SaveNodeDatas(nodeConfigs);
+    return Ok(nodeConfigs);
+  }
+  
+  [Route("[action]")]
+  [ProducesResponseType(typeof(NodeData), 200)]
+  [ProducesResponseType(204)]
+  [ProducesResponseType(401)]
+  [ProducesResponseType(500)]
+  [HttpPost]
+  public IActionResult SaveNodeData([FromBody] NodeData nodeData) {
+    ModellingLogic.SaveNodeData(nodeData);
+    return Ok(nodeData);
+  }
+
+
+  [Route("[action]")]
+  [ProducesResponseType(typeof(List<ActivityDefinition>), 200)]
+  [ProducesResponseType(204)]
+  [ProducesResponseType(401)]
+  [ProducesResponseType(500)]
+  [HttpGet]
+  public IActionResult GetActivityDefinitions() {
+    var result = ModellingLogic.GetActivityDefinitions();
+    return Ok(result);
+  }
+
+  [Route("[action]")]
+  [ProducesResponseType(typeof(ActivityDefinition), 200)]
+  [ProducesResponseType(204)]
+  [ProducesResponseType(401)]
+  [ProducesResponseType(500)]
+  [HttpGet]
+  public IActionResult GetActivityDefinitionById(long idActivityDefinition) {
+    var result = ModellingLogic.GetActivityDefinitionById(idActivityDefinition);
+    return Ok(result);
+  }
 }

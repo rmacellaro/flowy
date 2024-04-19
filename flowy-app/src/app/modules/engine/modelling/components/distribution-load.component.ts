@@ -1,6 +1,6 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { Distribution } from '../models/distribution.model';
-import { EngineModellingDistributionsService } from '../services/distributions.service';
+import { EngineModellingService } from '../services/modelling.service';
 
 @Component({
   selector: 'engine-modelling-distribution-load',
@@ -30,7 +30,7 @@ export class EngineModellingDistributionLoadComponent implements OnInit {
   public error?: string;
 
   constructor(
-    private modellingService: EngineModellingDistributionsService
+    private modellingService: EngineModellingService
   ) {
     console.log('EngineModellingDistributionLoadComponent');
   }

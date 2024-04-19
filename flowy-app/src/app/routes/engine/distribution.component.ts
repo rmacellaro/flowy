@@ -1,21 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { EngineModellingProcessLoadComponent } from '../../modules/engine/modelling/components/process-load.component';
+import { LayoutService } from '../../modules/layout/services/layout.service';
 
 @Component({
   selector: 'app-engine-distribution',
   template: `
-    <engine-modelling-distribution-load [idDistribution]="idDistribution">
-      <engine-modelling-distribution-editor></engine-modelling-distribution-editor>
+    <engine-modelling-distribution-load [idDistribution]="idDistribution" #distributionLoad>
+      <engine-modelling-distribution-editor *ngIf="distributionLoad.distribution" [distribution]="distributionLoad.distribution"></engine-modelling-distribution-editor>
     </engine-modelling-distribution-load>
   `
 })
-export class AppEngineDistributionComponent implements OnInit {
+export class AppEngineDistributionComponent implements OnInit, OnDestroy {
 
   public idDistribution: number;
 
   constructor(
     private route: ActivatedRoute,
+    public layout: LayoutService,
     private pc: EngineModellingProcessLoadComponent
   ) {
     const id = this.route.snapshot.paramMap.get('idDistribution');
@@ -23,5 +25,6 @@ export class AppEngineDistributionComponent implements OnInit {
     this.idDistribution = parseInt(id);
   }
 
-  ngOnInit(): void { }
+  ngOnDestroy(): void { this.layout.sidebarToggle(true); console.log('????IEIE????'); }
+  ngOnInit(): void { this.layout.sidebarToggle(false); }
 }

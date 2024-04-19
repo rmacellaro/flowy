@@ -4,8 +4,9 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { EngineProcessingService } from './services/processing.service';
 import { EngineProcessingInstanceComponent } from './components/instance.component';
-import { ActivitiesModule } from '../../activities/activities.module';
+import { ActivitiesModule } from '../activities/activities.module';
 import { EngineProcessingInstancesListComponent } from './components/instances-list.component';
+import { UiModule } from '../../ui/ui.module';
 
 
 @NgModule({
@@ -17,7 +18,8 @@ import { EngineProcessingInstancesListComponent } from './components/instances-l
     CommonModule,
     ActivitiesModule,
     ReactiveFormsModule,
-    FormsModule
+    FormsModule,
+    UiModule
   ],
   exports: [
     EngineProcessingInstanceComponent,

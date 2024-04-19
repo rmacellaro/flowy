@@ -28,5 +28,5 @@ public class Instance {
     /// Sono i Dati associati a questa istanza di lavorazione
     /// </summary>
     /// <value></value>
-    public ICollection<Data>? Datas { get; set; }
+    public ICollection<InstanceData>? Datas { get; set; }
 }

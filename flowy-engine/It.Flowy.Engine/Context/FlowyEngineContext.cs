@@ -8,15 +8,20 @@ namespace It.Flowy.Engine.Context;
 public class FlowyEngineContext : DbContext {
 
   #region Modelling
-  public DbSet<Models.Modelling.Interaction>? Interactions { get; set; }
-  public DbSet<Models.Modelling.Configuration>? Configurations { get; set; }
-  public DbSet<Models.Modelling.Node>? Nodes { get; set; }
   public DbSet<Models.Modelling.Process>? Processes { get; set; }
   public DbSet<Models.Modelling.Distribution>? Distributions { get; set; }
+  public DbSet<Models.Modelling.Node>? Nodes { get; set; }
+  public DbSet<Models.Modelling.NodeData>? NodeDatas { get; set; }
+  public DbSet<Models.Modelling.NodeDataType>? NodeDataTypes { get; set; }
+  public DbSet<Models.Modelling.Activity>? Activities { get; set; }
+  public DbSet<Models.Modelling.ActivityData>? ActivityDatas { get; set; }
+  public DbSet<Models.Modelling.ActivityDefinition>? ActivityDefinitions { get; set; }
+  public DbSet<Models.Modelling.ActivityDefinitionDataType>? ActivityDefinitionDataTypes { get; set; }
+  public DbSet<Models.Modelling.Link>? Links { get; set; }
   #endregion
 
   #region Processing
-  public DbSet<Models.Processing.Data>? Datas { get; set; }
+  public DbSet<Models.Processing.InstanceData>? InstanceDatas { get; set; }
   public DbSet<Models.Processing.Instance>? Instances { get; set; }
   public DbSet<Models.Processing.Track>? Tracks { get; set; }
   public DbSet<Models.Processing.Wire>? Wires { get; set; }
@@ -40,6 +45,7 @@ public class FlowyEngineContext : DbContext {
       o.SchemaBehavior(MySqlSchemaBehavior.Translate, (schema, table) => $"{schema}_{table}");
       //o.MigrationsHistoryTable(DefaultSchema + "__EF_Migrations");
     })
+    //.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking)
     .LogTo(Console.WriteLine, LogLevel.Information)
     .EnableSensitiveDataLogging()
     .EnableDetailedErrors();

@@ -41,12 +41,12 @@ public class ProcessingController(IProcessingLogic procLog): Controller {
     [ProducesResponseType(401)]
     [ProducesResponseType(500)]
     [HttpGet]
-    public IActionResult GetStartNodeWithInteractionByIdDistribution(long idDistribution) {
-        var result = ProcessingLogic.GetStartNodeWithInteractionByIdDistribution(idDistribution);
+    public IActionResult GetStartNodeByIdDistribution(long idDistribution) {
+        var result = ProcessingLogic.GetStartNodeByIdDistribution(idDistribution);
         return Ok(result);
     }   
 
-    [Route("[action]")]
+    /*[Route("[action]")]
     [ProducesResponseType(typeof(Interaction), 200)]
     [ProducesResponseType(204)]
     [ProducesResponseType(401)]
@@ -55,7 +55,7 @@ public class ProcessingController(IProcessingLogic procLog): Controller {
     public IActionResult GetInteractionWithConfigurationsById(long idInteraction) {
         var result = ProcessingLogic.GetInteractionWithConfigurationsById(idInteraction);
         return Ok(result);
-    }    
+    }   */ 
 
     [Route("[action]")]
     [ProducesResponseType(typeof(Instance), 200)]

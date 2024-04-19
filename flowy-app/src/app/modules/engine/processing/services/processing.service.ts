@@ -3,33 +3,32 @@ import { HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 import { Node } from '../../modelling/models/node.model';
-import { Interaction } from '../../modelling/models/interaction.model';
 import { Instance } from '../models/instance.model';
-import { EngineBaseService } from '../../common/base.service';
+import { EngineBaseService } from '../../common/services/base.service';
 
 @Injectable({ providedIn: 'root' })
 export class EngineProcessingService extends EngineBaseService {
 
-  public GetStartNodeWithInteractionByIdDistribution(idDistribution: number): Observable<Node> {
+  public GetStartNodeByIdDistribution(idDistribution: number): Observable<Node> {
     var params: HttpParams = new HttpParams();
     params = params.set('idDistribution', idDistribution.toString());
-    return this.http.get<Node>(this.baseApi + 'Processing/GetStartNodeWithInteractionByIdDistribution',{
+    return this.http.get<Node>(this.baseApi + 'Processing/GetStartNodeByIdDistribution',{
       params
     });
   }
 
-  public GetInteractionWithConfigurationsById(idInteraction: number): Observable<Interaction> {
+  /*public GetInteractionWithConfigurationsById(idInteraction: number): Observable<Interaction> {
     var params: HttpParams = new HttpParams();
     params = params.set('idInteraction', idInteraction.toString());
     return this.http.get<Interaction>(this.baseApi + 'Processing/GetInteractionWithConfigurationsById',{
       params
     });
-  }
+  }*/
 
-  public GetInstanceByIdWire(idWire: number): Observable<Interaction> {
+  public GetInstanceByIdWire(idWire: number): Observable<Instance> {
     var params: HttpParams = new HttpParams();
     params = params.set('idWire', idWire.toString());
-    return this.http.get<Interaction>(this.baseApi + 'Processing/GetInstanceByIdWire',{
+    return this.http.get<Instance>(this.baseApi + 'Processing/GetInstanceByIdWire',{
       params
     });
   }

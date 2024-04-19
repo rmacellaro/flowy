@@ -2,20 +2,17 @@ import { Component, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { Instance } from '../models/instance.model';
 import { Wire } from '../models/wire.model';
 import { EngineProcessingService } from '../services/processing.service';
-import { Interaction } from '../../modelling/models/interaction.model';
 
-import { ActivityMainComponent } from '../../../activities/components/activity-main.component';
+import { ActivityMainComponent } from '../../activities/components/activity-main.component';
 import { Distribution } from '../../modelling/models/distribution.model';
 import { Process } from '../../modelling/models/process.model';
+import { Activity } from '../../modelling/models/activity.model';
 
 @Component({
   selector: 'engine-processing-instance',
   template: `
     <div class="relative">
-      <div class="absolute" *ngIf="isInLoading">
-        loading ...
-      </div>
-
+      <ui-spinner class="absolute" [isInLoading]="isInLoading"></ui-spinner>
       <div class="row mb-3">
         <div class="col-auto">
           <div class="dropdown" *ngIf="process">
@@ -25,7 +22,6 @@ import { Process } from '../../modelling/models/process.model';
               <span class="fw-light me-2">Versione:</span>
               <b>{{currentDistribution?.version}}</b>
             </a>
-
             <ul class="dropdown-menu">
               <li *ngFor="let item of process.distributions">
                 <a class="dropdown-item" href="javascript:;" (click)="onChangedDistribution(item)">
@@ -41,31 +37,31 @@ import { Process } from '../../modelling/models/process.model';
               href="javascript:;" role="button"
               data-bs-toggle="dropdown" aria-expanded="false">
               <span class="fw-light me-2">Filo:</span>
-              <b>{{currentWire?.node?.title}}</b>
+              <b>{{currentWire?.node?.key}}</b>
             </a>
 
             <ul class="dropdown-menu">
               <li *ngFor="let item of currentInstance.wires">
                 <a class="dropdown-item" href="javascript:;" (click)="onChangedWire(item)">
-                  {{ item.node?.title }}
+                  {{ item.node?.key }}
                 </a>
               </li>
             </ul>
           </div>
         </div>
         <div class="col-auto">
-          <div class="dropdown">
+          <div class="dropdown" *ngIf="currentInstance">
             <a class="btn btn-lg btn-secondary dropdown-toggle"
               href="javascript:;" role="button"
               data-bs-toggle="dropdown" aria-expanded="false">
               <span class="fw-light me-2">Interazione:</span>
-              <b>{{currentInteraction?.name}}</b>
+              <b>{{currentActivity?.key}}</b>
             </a>
 
             <ul class="dropdown-menu">
-              <li *ngFor="let item of currentWire?.node?.interactions">
-                <a class="dropdown-item" href="javascript:;" (click)="onChangedInteraction(item)">
-                  {{ item.name }}
+              <li *ngFor="let item of currentWire?.node?.activities">
+                <a class="dropdown-item" href="javascript:;" (click)="onChangedActivity(item)">
+                  {{ item.key }}
                 </a>
               </li>
             </ul>
@@ -78,15 +74,15 @@ import { Process } from '../../modelling/models/process.model';
         <div>{{currentWire?.reason}}</div>
       </div>
 
-      <div *ngIf="currentInstance">
-        <activity-main #interactionMain (onContinue)="onContinue($event)"></activity-main>
+      <div>
+        <activity-main #activityMain (onContinue)="onContinue($event)"></activity-main>
       </div>
     </div>
   `
 })
 export class EngineProcessingInstanceComponent implements OnInit {
 
-  @ViewChild('interactionMain', {read: ActivityMainComponent}) interactionMain?: ActivityMainComponent
+  @ViewChild('activityMain', {read: ActivityMainComponent, static: false}) activityMain?: ActivityMainComponent
 
   @Input() process?: Process;
   @Input() idWire?: number;
@@ -95,7 +91,7 @@ export class EngineProcessingInstanceComponent implements OnInit {
   public currentDistribution?: Distribution;
   public currentInstance?: Instance;
   public currentWire?: Wire;
-  public currentInteraction?: Interaction;
+  public currentActivity?: Activity;
 
   constructor(
     //private container: ViewContainerRef,
@@ -134,8 +130,9 @@ export class EngineProcessingInstanceComponent implements OnInit {
   newInstance(): void {
     if (!this.currentDistribution || !this.currentDistribution.id){ return; }
     this.isInLoading = true;
-    this.processingService.GetStartNodeWithInteractionByIdDistribution(this.currentDistribution.id).subscribe({
+    this.processingService.GetStartNodeByIdDistribution(this.currentDistribution.id).subscribe({
       next: (result) => {
+        console.log('START NODE', result);
         this.currentInstance = new Instance();
         this.currentInstance.idDistribution = this.currentDistribution?.id;
         const wire = new Wire();
@@ -157,26 +154,32 @@ export class EngineProcessingInstanceComponent implements OnInit {
   }
 
   onChangedWire(wire: Wire): void {
+    this.activityMain?.clear();
     this.currentWire = wire;
     console.log('onChangeWire', wire);
     this.currentWire = wire;
-    this.currentInteraction = wire.node?.interactions?.find(i => i.type == 'DEFAULT');
+    if (!wire.node || !wire.node.activities) { return;}
+    this.onChangedActivity(wire.node.activities[0]);
+    //this.activityMain?.setActivity(wire.node);
+    /*this.currentInteraction = wire.node?.interactions?.find(i => i.type == 'DEFAULT');
     if (this.currentInteraction){ this.onChangedInteraction(this.currentInteraction); }
     if(wire.state == 'ERROR'){
-      /*this.messageService.add({
+      this.messageService.add({
         severity: 'error',
         summary: 'Errore',
         detail: 'Il Filo selezionato è in uno stato di errore'
-      });*/
-    }
+      });
+    }*/
   }
 
-  onChangedInteraction(interaction: Interaction): void {
-    this.currentInteraction = interaction;
-    console.log('onChangeInteraction', interaction);
-    if (!interaction.id) { return; }
-    this.isInLoading = true;
-    this.processingService.GetInteractionWithConfigurationsById(interaction.id).subscribe({
+  onChangedActivity(activity: Activity): void {
+    this.currentActivity = activity;
+    console.log('onChangedActivity', activity);
+    if (!activity.id) { return; }
+    this.activityMain?.setActivity(activity);
+    //this.isInLoading = true;
+
+    /*this.processingService.GetInteractionWithConfigurationsById(interaction.id).subscribe({
       next: (result) => {
         console.log('LOADED INTERACTION', result);
         this.interactionMain?.setInteraction(result);
@@ -186,7 +189,7 @@ export class EngineProcessingInstanceComponent implements OnInit {
         console.error(err);
         this.isInLoading = false;
       }
-    });
+    });*/
   }
 
   onContinue(partianData: any): void {

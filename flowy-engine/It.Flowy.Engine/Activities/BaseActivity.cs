@@ -7,30 +7,30 @@ namespace It.Flowy.Engine.Activities;
 public abstract class BaseActivity {
 
     public Wire? CurrentWire { get; private set; }
-    public Instance? CurrentInstance { get; private set;}
-    public Interaction? CurrentInteraction { get; private set;}
 
-    public virtual void Setup(
-        Wire wire,
-        Instance instance,
-        Interaction interaction
-    ) {
+    public virtual void Setup(Wire wire) {
         CurrentWire = wire;
-        CurrentInstance = instance;
-        CurrentInteraction = interaction;
     }
 
     public virtual List<string> Execution() {
-        return ["NEXT"];
+        return [];
     }
 
-    public List<string> GetNextsFromInteractionConfigurations(string type = "System.BE", string name = "Nexts"){
-        if (CurrentInteraction == null) { throw new Exception("Interaction not found"); }
-        if (CurrentInteraction.Configurations == null || CurrentInteraction.Configurations.Count <= 0) { throw new Exception("Configurations not found in interaction: " + CurrentInteraction.Id);}
-        Configuration? config = CurrentInteraction.Configurations.FirstOrDefault(c => c.Type != null && c.Type.Equals(type) && c.Name != null && c.Name.Equals(name));
-        if (config == null || config.Value == null) { throw new Exception("Configuration System.BE.Nexts not found");}
-        List<string>? lst =  JsonConvert.DeserializeObject<List<string>>(config.Value);
-        if(lst == null) { throw new Exception("Configuration System.BE.Nexts incorrect value");}
-        return lst;
+    /*public long? GetTargetLinkByIndex(int index) {
+        if (CurrentWire == null) { throw new Exception("Wire not found"); }
+        if (CurrentWire.Node == null) { throw new Exception("Node not found"); }
+        if (CurrentWire.Node.OutputLinks == null) { throw new Exception("Node not found"); }
+        Link? link =  null;
+        try{ link = CurrentWire.Node.OutputLinks.ToList()[index]; } catch {}
+        return link?.IdTargetNode;
     }
+
+    public long? GetTargetLinkByKey(string key){
+        if (CurrentWire == null) { throw new Exception("Wire not found"); }
+        if (CurrentWire.Node == null) { throw new Exception("Node not found"); }
+        if (CurrentWire.Node.OutputLinks == null) { throw new Exception("Node not found"); }
+        Link? link = CurrentWire.Node.OutputLinks.FirstOrDefault(o => o.Key == key);
+        if (link == null) { throw new Exception("No out link by key");}
+        return link.IdTargetNode;
+    }*/
 }

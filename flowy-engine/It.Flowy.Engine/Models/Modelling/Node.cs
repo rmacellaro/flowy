@@ -10,11 +10,16 @@ public class Node {
     public long? IdDistribution { get; set; }
     public Distribution? Distribution { get; set; }
 
-    public string Title { get; set; } = string.Empty;
     public string Key { get; set; } = Guid.NewGuid().ToString();
-    public string? Description { get; set; }
-    public string? Color { get; set; }
-    public double? Percentage { get; set; }
+    //public string Title { get; set; } = string.Empty;
+    //public string? Description { get; set; }
 
-    public ICollection<Interaction>? Interactions { get; set; }
+    public ICollection<NodeData>? Datas { get; set; }
+    public ICollection<Activity>? Activities { get; set; }
+
+    [InverseProperty(nameof(Link.SourceNode))]
+    public ICollection<Link>? OutputLinks { get; set;}
+
+    [InverseProperty(nameof(Link.TargetNode))]
+    public ICollection<Link>? InputLinks { get; set;}
 }
